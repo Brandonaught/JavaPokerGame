@@ -1,0 +1,346 @@
+​#include <iostream>
+#include <string>
+#include <ctime>
+#include <cstdlib>
+#include <iomanip>
+
+using namespace std;
+
+void loadCardNames(string cardNames[13]);
+void loadSuitNames(string suitNames[4]);
+void shuffleDeck(int taken[52]);
+void dealHand(int taken[52], int hand[5], int &handsDealt);
+void discardAndDeal(int taken[52], int hand[5], string suitNames[4], string cardNames[13],/* int rankValue[5], int suitValue[5],*/ int &handsDealt, int &whichCardWasDiscarded, string name);
+void displayHand(string suitNames[4], string cardNames[13], int hand[5], int rankValue[5], int suitValue[5]);
+void reward(int hand[5], int bank, string name);
+bool again(string title, string name);
+void poker_Table();
+void greeting(int &bank, string &name);
+void displayAmount(int &bank, string name);
+void displayDiscard(string cardNames[13], string suitNames[4], int hand[5], int whichCardWasDiscarded);
+void loadBucket(int bucket[13]);
+void detectCardsInHand(int bucket[13], int rankValue[5], int suitValue[5], int &winnings);
+void cashout(int &bank, int &winnings);
+
+int main()
+
+
+{
+string cardNames[13], suitNames[4], name;
+int hand[5], bucket[13], rankValue[5], suitValue[5], handsDealt = 0, bank = 0, taken[52], whichCardWasDiscarded = 0, winnings = 0;
+greeting(bank, name);
+loadCardNames(cardNames);
+loadSuitNames(suitNames);
+loadBucket(bucket);
+srand(time(NULL));
+do
+{
+if(handsDealt %300 == 0)
+shuffleDeck(taken);
+displayAmount(bank, name);
+dealHand(taken,hand, handsDealt);
+
+displayHand(suitNames, cardNames, hand, suitValue, rankValue);
+shuffleDeck(taken);
+discardAndDeal(taken, hand, suitNames, cardNames,/* rankValue, suitValue, */handsDealt, whichCardWasDiscarded, name);
+displayHand(suitNames, cardNames, hand, suitValue, rankValue);
+detectCardsInHand(bucket,rankValue, suitValue, winnings);
+cashout(bank, winnings);
+}while(again("Would you like to play again? ", name));
+
+return 0;
+}
+
+void loadCardNames(string cardNames[13])
+{
+cardNames[0] = "Ace";
+cardNames[1] = "Two";
+cardNames[2] = "Three";
+cardNames[3] = "Four";
+cardNames[4] = "Five";
+cardNames[5] = "Six";
+cardNames[6] = "Seven";
+cardNames[7] = "Eight";
+cardNames[8] = "Nine";
+cardNames[9] = "Ten";
+cardNames[10] = "Jack";
+cardNames[11] = "Queen";
+cardNames[12] = "King";
+
+}
+
+void loadSuitNames(string suitNames[4])
+{
+suitNames[0] = "Spades";
+suitNames[1] = "Hearts";
+suitNames[2] = "Clubs";
+suitNames[3] = "Diamonds";
+}
+
+void shuffleDeck(int taken[52])
+{
+for(int i = 0; i < 52; ++i)
+taken[i] = 8;
+}
+
+
+void dealHand(int taken[52], int hand[5], int &handsDealt)
+{
+int cardNumber;
+handsDealt++;
+for(int i = 0; i < 5; ++i)
+{
+while(taken[cardNumber = rand()%52] == 0);
+taken[cardNumber]--;
+hand[i] = cardNumber;
+}
+}
+
+
+void displayHand(string suitNames[4], string cardNames[13], int hand[5], int suitValue[5], int rankValue[5])
+{
+int suit, rankkk;
+cout<<endl<<"Your hand is:"<<endl;
+for(int i = 0; i < 5; ++i)
+{
+suit = hand[i] / 13;
+rankkk = hand[i] % 13;
+suitValue[i] = suit;
+rankValue[i] = rankkk;
+cout<<cardNames[rankkk]<<" of "<<suitNames[suit]<<endl;
+
+}
+}
+/*
+Card Card Number
+Ace of Spades 0
+Two of Spades 1
+.
+.
+King of Spades 12
+Ace of Hearts 13
+.
+.
+King of Hearts 25
+Ace of Clubs 26
+Two of Clubs 27
+.
+.
+King of Clubs 38
+Ace of Diamonds 39
+.
+.
+King of Diamonds 51
+
+suit = cardNumber / 13;
+faceValue = cardNumber % 13;
+*/
+bool again(string title, string name)
+{
+char ans;
+cout<<"Good game,"<<name<<". "<<title;
+cin>>ans;
+return ans == 'y' || ans == 'Y';
+}
+
+void greeting(int &bank , string &name)
+{
+string mister;
+//int money;
+cout<<"Hello and welcome to Video Poker Extreme!"<<endl;
+cout<<"May I have your name? "<<endl;
+cin>>mister;
+name = mister;
+poker_Table();
+cout<<name<<", "<<"how much would you like to deposit into your bank? "<<endl;
+cin>>bank;
+
+}
+void discardAndDeal(int taken[52], int hand[5], string suitNames[4], string cardNames[13],/* int rankValue[5], int suitValue[5], */int &handsDealt, int &whichCardWasDiscarded, string name)
+{
+unsigned int input = 0, input2 = 0, input3 = 0, input4 = 0, input5 = 0;
+int cardNumber;
+handsDealt++;
+cout<<name<<","<<"which cards would you like to discard?"<<endl<<"Starting from top to bottom seperated by spaces: "<<endl;
+cout<<"Type 0 if you want to keep a card. "<<endl;
+cout<<"1_2_3_4_5 <-Card Arrangement"<<endl;
+cin>>input>>input2>>input3>>input4>>input5;
+{
+if((input != 0) && input == 1)
+{ //if(taken[cardNumber = rand()%52] == 0)
+whichCardWasDiscarded = 0;
+displayDiscard(cardNames,suitNames,hand, whichCardWasDiscarded);
+taken[cardNumber = rand()%52];
+taken[cardNumber]--;
+hand[0] = cardNumber;
+}else cout<<"Keeping card 1."<<endl;
+}
+{
+if((input2 != 0) && input2 == 2)
+{ //if(taken[cardNumber = rand()%52] == 0)
+whichCardWasDiscarded = 1;
+displayDiscard(cardNames,suitNames,hand, whichCardWasDiscarded);
+taken[cardNumber = rand()%52];
+taken[cardNumber]--;
+hand[1] = cardNumber;
+}else cout<< "Keeping card 2."<<endl;
+}
+{
+if((input3 != 0) && input3 == 3)
+{ //if(taken[cardNumber = rand()%52] == 0)
+whichCardWasDiscarded = 2;
+displayDiscard(cardNames,suitNames,hand, whichCardWasDiscarded);
+taken[cardNumber = rand()%52];
+taken[cardNumber]--;
+hand[2] = cardNumber;
+
+}else cout<<"Keeping card 3."<<endl;
+}
+{
+if((input4 != 0 ) && input4 == 4)
+{ //if(taken[cardNumber = rand()%52] == 0)
+whichCardWasDiscarded = 3;
+displayDiscard(cardNames,suitNames,hand, whichCardWasDiscarded);
+taken[cardNumber = rand()%52];
+taken[cardNumber]--;
+hand[3] = cardNumber;
+}else cout<<"Keeping card 4."<<endl;
+}
+{
+if((input5 != 0 ) && input5 == 5)
+{ //if(taken[cardNumber = rand()%52] == 0)
+whichCardWasDiscarded = 4;
+displayDiscard(cardNames,suitNames,hand, whichCardWasDiscarded);
+taken[cardNumber = rand()%52];
+taken[cardNumber]--;
+hand[4] = cardNumber;
+}else cout<<"Keeping card 5."<<endl;
+}
+}
+
+
+void poker_Table()
+{
+cout<<"|Wining Hands"<<setfill(' ')<<setw(24)<<"|Coins";
+cout<<setfill('-')<<setw(70)<<endl;
+cout<<"\n"<<'|'<<"Royal Flush"<<setfill(' ')<<setw(20)<<'|'<<"475"<<endl;
+cout<<'|'<<"Straight Flush"<<setfill(' ')<<setw(17)<<'|'<<"250"<<endl;
+cout<<'|'<<"Four of a Kind"<<setfill(' ')<<setw(17)<<'|'<<"125"<<endl;
+cout<<'|'<<"Full House"<<setfill(' ')<<setw(21)<<'|'<<"40"<<endl;
+cout<<'|'<<"Flush"<<setfill(' ')<<setw(26)<<'|'<<"25"<<endl;
+cout<<'|'<<"Straight"<<setfill(' ')<<setw(23)<<'|'<<"20"<<endl;
+cout<<'|'<<"Three of a Kind"<<setfill(' ')<<setw(16)<<'|'<<"15"<<endl;
+cout<<'|'<<"Two Pairs"<<setfill(' ')<<setw(22)<<'|'<<"10"<<endl;
+cout<<'|'<<"Pair"<<setfill(' ')<<setw(27)<<'|'<<"1"<<endl;
+cout<<'|'<<"Junk"<<setfill(' ')<<setw(27)<<'|'<<"0"<<endl;
+}
+void displayAmount(int &bank, string name)
+{
+unsigned int bet = 0;
+do{
+
+if(bank == 0)
+{cout<<"Either you've run out of funds or you're trying to be sneaky! Restarting program..."<<endl;
+greeting(bank, name);
+}
+}while(bank == 0);
+
+do{
+cout<<name<<", "<<"how much are you going to bet for this game? (Minimum 1 coin)"<<endl;
+cin>>bet;
+if(bet > bank)
+cout<<name<<", "<<"I'm sorry, that amount is more than you have. Try again."<<endl;
+}while(bet > bank);
+bank = (bank - bet);
+cout<<"You have: "<<bank<<" coins left, "<<name<<"."<<endl;
+}
+void displayDiscard(string cardNames[13], string suitNames[4], int hand[5], int whichCardWasDiscarded)
+{
+int suitt, faceRankk, i = whichCardWasDiscarded;
+suitt = hand[i]/13;
+faceRankk = hand[i] % 13;
+cout<<"You've discarded a "<<cardNames[faceRankk]<<" of "<<suitNames[suitt]<<endl;
+
+}
+void loadBucket(int bucket[13])
+{
+
+int i = bucket[i];
+for (i = 0; i < 13; i++)
+if (bucket[i] < bucket[12])
+i++;
+
+}
+void detectCardsInHand(int bucket[13],int rankValue[5], int suitValue[5], int &winnings)
+{
+int reward, deuces = 0, triplets = 0, straightCounter = 0,
+spades = 0, heart = 0, diamond = 0, clubs = 0, flush = 0;
+for(int i = 0; i < 5 ;i++)
+{
+int temp = rankValue[i];
+bucket[temp] += 1;
+}
+for(int i = 0; i<5; i++)
+{
+if(suitValue[i]==0)
+spades ++;
+else if(suitValue[i]== 1)
+heart ++;
+else if(suitValue[i] == 2)
+clubs ++;
+else if(suitValue[i] == 3)
+diamond ++;
+}
+if(spades == 5 || heart == 5 || clubs == 5 || diamond == 5)
+reward = 25;
+flush++;
+for(int i = 0; i < 13;i++)
+{
+int temp = bucket[i];
+if(bucket[i] == 4)
+reward = 125;
+else
+if(bucket[i] == 3 && temp == 3)
+triplets++;
+else if(bucket[i] == 2 && temp == 2)
+deuces++;
+else if(bucket[i] == 1)
+reward = 0;
+else if(bucket[i] == 1)
+straightCounter ++;
+else if(bucket[i] == 0)
+straightCounter --;
+else
+if(flush = 1 && straightCounter == 1)
+reward = 475;
+}
+if(triplets == 1 && deuces == 1)
+reward = 40;
+else
+if(triplets == 1)
+reward = 15;
+else if(deuces == 2 )
+reward = 10;
+else
+if(bucket[0] == 2 || bucket[10] == 2 || bucket[11] == 2 || bucket[12] == 2)
+reward = 1;
+else
+if (straightCounter == 5 && flush != 0)
+reward = 20;
+else
+winnings = reward;
+cout<<"You've won "<<reward<<"coins!"<<endl;
+for(int i = 0; i < 5 ;i++)
+{
+int temp = rankValue[i];
+bucket[temp] -= 1;
+}
+}
+void cashout(int &bank, int &winnings)
+{
+int cashingOut;
+cashingOut = (bank + winnings);
+bank = cashingOut;
+winnings = 0;
+}
+
